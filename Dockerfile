@@ -13,8 +13,8 @@ RUN uv venv
 # 5. Install the required Python packages inside the virtual environment
 RUN uv pip install --no-cache-dir -r requirements.txt
 
-# 6. Make port 80 available to the world outside this container
-EXPOSE 80
+# 6. Make port 8080 available to the world outside this container
+EXPOSE 8080
 
 # 7. Define environment variable to ensure Python output is sent straight to terminal without buffering
 ENV PYTHONUNBUFFERED=1
