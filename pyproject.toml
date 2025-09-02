@@ -1,0 +1,17 @@
+[project]
+name = "realtime-stock-insights"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask==3.1.0",
+    "flask-cors==6.0.1",
+    "langchain-core>=0.3.75",
+    "langchain-tavily>=0.2.11",
+    "langchain[google-genai]>=0.3.27",
+    "langgraph>=0.6.6",
+    "langsmith>=0.4.20",
+    "python-dotenv==1.0.0",
+    "yfinance==0.2.65",
+]

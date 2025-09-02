@@ -97,5 +97,5 @@ def chat():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    print("Starting Flask Stock Chatbot Server...")
-    app.run(debug=True, port=5000)
+    print("Starting Flask Stock Chatbot Server @@...")
+    app.run(debug=True, port=8080)
