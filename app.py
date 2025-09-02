@@ -6,8 +6,13 @@ from langchain_tavily import TavilySearch
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import InMemorySaver
 from helper import State, route_tools, BasicToolNode
+import os
 
 load_dotenv()
+
+# Configure LangSmith tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_PROJECT"] = "realtime-stock-insights"
 
 app = Flask(__name__)
 CORS(app)
