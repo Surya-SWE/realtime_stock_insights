@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            height: 85vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f7f8fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .user-message .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #messageInput:focus {
+            border-color: #667eea;
+        }
+
+        #sendButton {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #sendButton:hover {
+            transform: scale(1.05);
+        }
+
+        #sendButton:active {
+            transform: scale(0.95);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: white;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .welcome-message h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .stock-ticker {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 0 2px;
+        }
+
+        .price-up {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .price-down {
+            color: #d32f2f;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Stock Market AI Assistant</h1>
+            <p>Get real-time stock prices, market news, and financial insights</p>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-message">
+                <h2>Welcome! 👋</h2>
+                <p>I can help you with stock prices, market trends, and financial information.</p>
+                <p style="margin-top: 10px;">Try asking about <span class="stock-ticker">AAPL</span> <span class="stock-ticker">GOOGL</span> <span class="stock-ticker">TSLA</span> or any other stock!</p>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input type="text" id="messageInput" placeholder="Ask about any stock... (e.g., 'What's Apple stock price?')" autofocus>
+                <button id="sendButton">Send</button>
+            </div>
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="sendQuickMessage('What is Apple stock price?')">AAPL Price</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Tell me about Tesla stock')">TSLA Info</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Google stock news')">GOOGL News</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Microsoft stock analysis')">MSFT Analysis</button>
+                <button class="quick-btn" onclick="sendQuickMessage('Amazon stock today')">AMZN Today</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const threadId = 'thread_' + Date.now();
+
+        // Clear welcome message on first message
+        let firstMessage = true;
+
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        sendButton.addEventListener('click', sendMessage);
+
+        function sendQuickMessage(message) {
+            messageInput.value = message;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            if (firstMessage) {
+                chatContainer.innerHTML = '';
+                firstMessage = false;
+            }
+
+            // Add user message
+            addMessage(message, 'user');
+            messageInput.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        thread_id: threadId
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Remove typing indicator
+                removeTypingIndicator();
+
+                if (data.response) {
+                    addMessage(formatResponse(data.response), 'bot');
+                } else if (data.error) {
+                    addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('Sorry, I couldn\'t connect to the server. Please try again.', 'bot');
+                console.error('Error:', error);
+            }
+        }
+
+        function addMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = content;
+            
+            messageDiv.appendChild(bubble);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message';
+            typingDiv.id = 'typing-indicator';
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'typing-indicator';
+            indicator.style.display = 'block';
+            indicator.innerHTML = '<span></span><span></span><span></span>';
+            
+            typingDiv.appendChild(indicator);
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function formatResponse(response) {
+            // Convert markdown bold (**text** or __text__)
+            response = response.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            response = response.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+            
+            // Convert markdown italic (*text* or _text_)
+            response = response.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            response = response.replace(/_([^_]+)_/g, '<em>$1</em>');
+            
+            // Convert markdown bullet points
+            response = response.replace(/^[\*\-]\s+(.+)$/gm, '• $1');
+            
+            // Format stock tickers
+            response = response.replace(/\b([A-Z]{1,5})\b/g, '<span class="stock-ticker">$1</span>');
+            
+            // Format prices
+            response = response.replace(/\$[\d,]+\.?\d*/g, function(match) {
+                return '<strong>' + match + '</strong>';
+            });
+            
+            // Format percentage changes
+            response = response.replace(/([+-]?\d+\.?\d*%)/g, function(match) {
+                const isPositive = match.startsWith('+') || (!match.startsWith('-') && parseFloat(match) > 0);
+                return `<span class="${isPositive ? 'price-up' : 'price-down'}">${match}</span>`;
+            });
+            
+            // Convert line breaks
+            response = response.replace(/\n/g, '<br>');
+            
+            return response;
+        }
+    </script>
+</body>
+</html>

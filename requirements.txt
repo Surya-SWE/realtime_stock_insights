@@ -1,0 +1,10 @@
+langgraph
+langchain
+langsmith
+langchain[google-genai]
+langchain-tavily
+langchain_core
+flask==3.1.0
+flask-cors==6.0.1
+python-dotenv==1.0.0
+yfinance==0.2.65
